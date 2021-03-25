@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3ec82a1d2b1276e1a676842e9818fa187e6c1a4e
 ## Fourier transform 
 
 With fourier analysis we can break a signal up into simple periodic signals. The main goal of our project is redraw a picture using Fourier transform. We are inspired from this video : https://youtu.be/r6sGWTCMz2k?t=1000 .
