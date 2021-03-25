@@ -1,3 +1,4 @@
+
 ## Fourier transform 
 
 With fourier analysis we can break a signal up into simple periodic signals. The main goal of our project is redraw a picture using Fourier transform. We are inspired from this video : https://youtu.be/r6sGWTCMz2k?t=1000 .
@@ -28,6 +29,3 @@ We will create a class named Circles that provides fubctions for :
    - Ayoubi	Kamal	kamal.ayoubi@etu.umontpellier.fr .
    - Jabbar	Otmane	otmane.jabbar@etu.umontpellier.fr .
    - Sadio	Stephane  stephane.sadio@etu.umontpellier.fr .
-
-  
-
