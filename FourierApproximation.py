@@ -1,86 +1,153 @@
 import numpy as np
-import math
 
-class FourierTransform:
-    """Calculate the complex Fourier coefficients for a given function
-    """
-    def __init__(self,
-            fxn,  # Function to be transformed (as Python function object)
-             # Note: y is parameterized by its own index
-             # 13th value in array = value of function at t=12
-            rnge, # (.,.) tuple of range at which to evaluate fxn
-            N=500,  # Number of coefficients to calculate
-            period=None,  # If different than full length of function
-            num_points=1000, # Number of points at which to evalute function
-            num_circles=50 # This is needed to calculate proper offsets
-        ):
+# Fourier.get_circles
+from itertools import chain
+
+class Fourier(object):
+    def __init__(self, n_approx = 1000, coord_1 = None, coord_2 = None):
+        if coord_1 is not None:
+            temp = coord_1[:,:,0] + 1j * coord_1[:,:,1]
+            self.complex_coord_1 = temp.reshape(temp.shape[0])
+        if coord_2 is not None:
+            temp = coord_2[:,:,0] + 1j * coord_2[:,:,1]
+            self.complex_coord_2 = temp.reshape(temp.shape[0])
+            # To ensure the two images then have the same "frequency"
+            if self.complex_coord_2.size > self.complex_coord_1.size:
+                self.complex_coord_1 = np.hstack((self.complex_coord_1, np.full((self.complex_coord_2.size - self.complex_coord_1.size), self.complex_coord_1[-1], dtype = np.complex_)))
+            elif self.complex_coord_1.size > self.complex_coord_2.size:
+                self.complex_coord_2 = np.hstack((self.complex_coord_2, np.full((self.complex_coord_1.size - self.complex_coord_2.size), self.complex_coord_2[-1], dtype = np.complex_)))
+        else:
+            self.complex_coord_2 = None
+
+        # Avoid aliasing
+        self.n_approx = self.complex_coord_1.size//2 if n_approx > self.complex_coord_1.size//2  else n_approx
+
+    def get_circles(self, mode=1):
+        if self.complex_coord_1 is not None and self.complex_coord_2 is not None:
+            return self.get_two_circles_two_images()
+        elif mode == 2:
+            return self.get_two_circles_one_image()
+        return self.get_one_circle_one_image()
         
-        self.num_circles = num_circles
-        
-        t_vals, y = zip(*[(v, fxn(v)) for v in np.linspace(rnge[0], rnge[1]-1, num_points)])
-        t_vals = np.array(t_vals)        
-        self.t_vals = t_vals
-        
-        
-        # Save the original coords when plotting
-        y = np.array(y)
-        y = y - y[0]
-        self.fxn_vals = np.array(deepcopy(y))
-        
-        # Spline function doesn't make endpoints exactly equal
-        # This sets the first and last points to their average
-        endpoint = np.mean([y[0], y[-1]])
-        y[0] = endpoint
-        y[-1] = endpoint
-        
-        # Transform works best around edges when function starts at zero
-        # (Can't figure out how to avoid Gibbs-type phenomenon when 
-        #  intercept !=0 )
-        y = y - y[0]
-        
-        self.N = N
-        if period==None:
-            period = rnge[1]
-        self.period = period
+    def get_one_circle_one_image(self):
+        period = self.complex_coord_1.size
+        time   = np.arange(period)
+        circles_loc = np.zeros((2*(self.n_approx-1), period), dtype = np.complex_)
+        circles_rad = np.zeros((2*(self.n_approx-1)), dtype = np.float_)
+
+        for idx, multiple in enumerate(chain(range(-self.n_approx+1, 0), range(1, self.n_approx))):
+            # Fourier coefficient
+            cn = self.cn(time, period, multiple, self.complex_coord_1)
+            # Radius of circle
+            circles_rad[idx] = np.absolute(cn)
+            # Location of point on circle
+            circles_loc[idx, :] = self.polar_locations(time, period, multiple, cn)
+
+        # Sorting big to small
+        order = np.argsort(circles_rad)[::-1]
+        circles_loc = circles_loc[order]
+        circles_rad = circles_rad[order]
+
+        # Location of each circle's center and the final point
+        circles_loc = np.add.accumulate(circles_loc, 0)
+                        
+        return period, (circles_rad,), (circles_loc,)
+
+    def get_two_circles_one_image(self):
+        period = self.complex_coord_1.size
+        time   = np.arange(period)
+        circles_loc_1 = np.zeros((2*(self.n_approx - 1), period), dtype = np.complex_)
+        circles_rad_1 = np.zeros((2*(self.n_approx - 1)), dtype = np.float_)
+        circles_loc_2 = np.zeros((2*(self.n_approx - 1), period), dtype = np.complex_)
+        circles_rad_2 = np.zeros((2*(self.n_approx - 1)), dtype = np.float_)
+
+        for idx, multiple in enumerate(range(1, self.n_approx)):
+
+            ### X coordinate Fourier Series
+            # an_1 = Fourier coefficient for cos, bn_1 = Fourier coefficient for sine
+            cn_1 = self.cn(time, period, multiple, self.complex_coord_1.real)
+            an_1, bn_1 = cn_1.real, cn_1.imag
+
+            circles_rad_1[idx] = np.absolute(an_1)
+            circles_rad_1[idx+self.n_approx-1] = np.absolute(bn_1)
+
+            circles_loc_1[idx, :] = self.cartesian_locations(time, period, multiple, an_1)
+            circles_loc_1[idx+self.n_approx-1, :] = self.cartesian_locations(time, period, multiple, bn_1)
+            # A Fourier term is both sine and cos,
+            # We are interested in getting both sine and cos Fourier Series terms real because we are solving for the X coordinate (real part of e^ix is cos)
+            # But self.cartesian_locations(time, period, multiple, bn_1) outputs the sine part as imaginary, so we flip!
+            # Note that flipping just means that the circle has a phase of 90 degrees at the start
+            circles_loc_1[idx+self.n_approx-1, :] = circles_loc_1[idx + self.n_approx - 1, :].imag + 1j * circles_loc_1[idx + self.n_approx - 1, :].real
             
-        def cn(n):
-            c = y*np.exp(-1j*2*n*np.pi*t_vals/period)
-            return(c.sum()/c.size)
+            ### Y coordinate Fourier Series
+            # an_2 = Fourier coefficient for cos, bn_2 = Fourier coefficient for sine
+            cn_2 = self.cn(time, period, multiple, self.complex_coord_1.imag)
+            an_2, bn_2 = cn_2.real, cn_2.imag
 
-        coefs = [cn(i) for i in range(1,N+1)]
-        self.coefs = coefs
-        self.real_coefs = [c.real for c in self.coefs]
-        self.imag_coefs = [c.imag for c in self.coefs]
+            circles_rad_2[idx] = np.absolute(bn_2)
+            circles_rad_2[idx+self.n_approx-1] = np.absolute(an_2)
+            
+            circles_loc_2[idx, :] = self.cartesian_locations(time, period, multiple, bn_2)
+            circles_loc_2[idx+self.n_approx-1, :] = self.cartesian_locations(time, period, multiple, an_2)
+            # A Fourier term is both sine and cos,
+            # We are interested in getting both sine and cos Fourier Series terms imaginary because we are solving for the Y coordinate (imaginary part of e^ix is sine)
+            # But self.cartesian_locations(time, period, multiple, bn_1) outputs the cos part as real, so we flip!
+            # Note that flipping just means that the circle has a phase of 90 degrees at the start
+            circles_loc_2[idx+self.n_approx-1, :] = circles_loc_2[idx + self.n_approx - 1, :].imag + 1j * circles_loc_2[idx + self.n_approx - 1, :].real
+
+        # Sorting big to small
+        order_1 = np.argsort(circles_rad_1)[::-1]
+        circles_loc_1 = circles_loc_1[order_1]
+        circles_rad_1 = circles_rad_1[order_1]
+        order_2 = np.argsort(circles_rad_2)[::-1]
+        circles_loc_2 = circles_loc_2[order_2]
+        circles_rad_2 = circles_rad_2[order_2]
         
-        self.amplitudes = np.absolute(self.coefs)
-        self.phases = np.angle(self.coefs)
-        
-        
-        def f(x, degree=N):
-            # Evaluate the function y at time t using Fourier approximiation of degree N
-            f = np.array([2*coefs[i-1]*np.exp(1j*2*i*np.pi*x/period) for i in range(1,degree+1)])
-            return(f.sum())
-        
-        # Evaluate function at all specified points in t domain
-        fourier_approximation = np.array([f(t, degree=N).real for t in t_vals])
-        circles_approximation = np.array([f(t, degree=self.num_circles).real for t in t_vals])
-        
-        # Set intercept to same as original function
-        #fourier_approximation = fourier_approximation - fourier_approximation[0] + self.original_offset 
-        
-        # Adjust intercept to minimize distance between entire function, 
-        # rather than just the intercepts. Gibbs-type phenomenon causes
-        # perturbations near endpoints of interval
-        fourier_approximation = fourier_approximation - (fourier_approximation - self.fxn_vals).mean()
-        
-        circles_approximation = circles_approximation - (circles_approximation - self.fxn_vals).mean()
-        self.circles_approximation = circles_approximation
-        
-        # Origin offset
-        self.origin_offset = fourier_approximation[0] - self.fxn_vals[0]
-        
-        # Circles offset
-        self.circles_approximation_offset = circles_approximation[0] - self.fxn_vals[0]
-        
-        # Set intercept to same as original function
-        self.fourier_approximation = fourier_approximation
+        # Location of each circle's center and the final point
+        circles_loc_1 = np.add.accumulate(circles_loc_1, 0)
+        circles_loc_2 = np.add.accumulate(circles_loc_2, 0)
+
+        return period, (circles_rad_1, circles_rad_2), (circles_loc_1, circles_loc_2)
+
+    def get_two_circles_two_images(self):
+        period = self.complex_coord_1.size
+        time   = np.arange(period)
+        circles_loc_1 = np.zeros((2*(self.n_approx-1), period), dtype = np.complex_)
+        circles_rad_1 = np.zeros((2*(self.n_approx-1)), dtype = np.float_)
+        circles_loc_2 = np.zeros((2*(self.n_approx-1), period), dtype = np.complex_)
+        circles_rad_2 = np.zeros((2*(self.n_approx-1)), dtype = np.float_)
+            
+        for idx, multiple in enumerate(chain(range(-self.n_approx+1, 0), range(1, self.n_approx))):
+            # Artificially entwine the two images by swapping their imaginary parts (Y coordinate) and then solving for Fourier coefficient
+            cn_1 = self.cn(time, period, multiple, self.complex_coord_1.real + 1j * self.complex_coord_2.imag)
+            cn_2 = self.cn(time, period, multiple, self.complex_coord_2.real + 1j * self.complex_coord_1.imag)
+
+            circles_rad_1[idx] = np.absolute(cn_1)
+            circles_rad_2[idx] = np.absolute(cn_2)
+                  
+            circles_loc_1[idx, :] = self.polar_locations(time, period, multiple, cn_1)              
+            circles_loc_2[idx, :] = self.polar_locations(time, period, multiple, cn_2)
+                                 
+        # Sorting big to small
+        order_1 = np.argsort(circles_rad_1)[::-1]
+        circles_loc_1 = circles_loc_1[order_1]
+        circles_rad_1 = circles_rad_1[order_1]
+        order_2 = np.argsort(circles_rad_2)[::-1]
+        circles_loc_2 = circles_loc_2[order_2]
+        circles_rad_2 = circles_rad_2[order_2]
+                                 
+        # Location of each circle's center and the final point
+        circles_loc_1 = np.add.accumulate(circles_loc_1, 0)
+        circles_loc_2 = np.add.accumulate(circles_loc_2, 0)
+
+        return period, (circles_rad_1, circles_rad_2), (circles_loc_1, circles_loc_2)
+
+    def cn(self, time, period, multiple, coordinates):
+        c = coordinates * np.exp(-1j * (2*multiple*np.pi/period) * time)
+        return c.sum() / period
+
+    def polar_locations(self, time, period, multiple, fourier_coeff):
+        return np.absolute(fourier_coeff) * np.exp(1j * ((2*multiple*np.pi/period) * time + np.angle(fourier_coeff)))
+
+    def cartesian_locations(self, time, period, multiple, fourier_coeff):
+        return fourier_coeff * np.exp(1j * ((2*multiple*np.pi/period) * time))
