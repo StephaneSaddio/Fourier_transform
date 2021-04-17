@@ -13,3 +13,14 @@ img_brut = Image.open(BytesIO(response.content))
 pylab.imshow(img_brut )
 pylab.show()
 
+
+#%%
+class ImageObject:
+
+    def __init__(self, img_brut ):
+        self.img = img_brut
+        self.og_size = self.img.size
+    
+    def show(self):
+        imshow(np.asarray(self.img))
+
