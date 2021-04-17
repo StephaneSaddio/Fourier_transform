@@ -1,4 +1,5 @@
 #%%
+
 from PIL import Image
 import requests
 from io import BytesIO
@@ -28,10 +29,19 @@ class Imagemanip:
     # Show raw image 
         imshow(np.asarray(self.img))
 
+    def single_color(self):
+        
+        # convert image to single color 
+        self.img_single_color = self.img.convert('L')
+
+
 
 #%%
+
 rabbit = Imagemanip(img_raw)
 rabbit.show()
+
+
 
 
 # %%
