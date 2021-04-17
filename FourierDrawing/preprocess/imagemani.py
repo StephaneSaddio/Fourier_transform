@@ -34,7 +34,10 @@ class Imagemanip:
         # convert image to single color 
         self.img_single_color = self.img.convert('L')
 
-
+    def black_and_white(self):
+        
+        # convert image to black and white
+        self.img_blackwhite = self.img.convert(mode='1', dither=2)
 
 #%%
 
