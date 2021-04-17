@@ -20,13 +20,13 @@ class Imagemanip:
 
     def __init__(self, img_raw ):
     
-    # Import raw image
+        # Import raw image
         self.img = img_raw
         self.og_size = self.img.size
     
     def show(self):
 
-    # Show raw image 
+        # Show raw image 
         imshow(np.asarray(self.img))
 
     def single_color(self):
@@ -34,23 +34,22 @@ class Imagemanip:
         # convert image to single color 
         self.img_single_color = self.img.convert('L')
 
-    def Binarize(self, scale=3, thresh_val=200):   
-        
+    def convert_binary(self, scale=3, thresh_val=200):   
+
         # convert image to nympy array 
         image_array = np.array(image)
 
-        # Binarize a numpy array using thresh_val as cutoff
-        for i in range(len(image_array)):
-            for j in range(len(image_array[0])):
-                if image_array[i][j] > thresh_val:
-                    image_array[i][j] = 255
-                else:
-                    image_array[i][j] = 0
-        
+        # convert to binary image_array using thresh_val to cut
+        white = 255
+        black = 0
+
+        initial_conv = np.where((image_array <= 200), image_array, white)
+        final_conv = np.where((initial_conv > 200), initial_conv, black)
+           
         image = Image.fromarray(image_array)
         
-        # scale image down to reduce number of non-zero pixels
-        self.img_sm = image.resize(tuple([int(v/scale) for v in image.size]),Image.ANTIALIAS)
+        # reduce number of non-zero pixels by scaling down the image
+        self.img_scale = image.resize(tuple([int(v/scale) for v in image.size]),Image.ANTIALIAS)
     
 
     def black_and_white(self):
@@ -60,11 +59,6 @@ class Imagemanip:
 
 
 #%%
-
 rabbit = Imagemanip(img_raw)
 rabbit.show()
 
-
-
-
-# %%
