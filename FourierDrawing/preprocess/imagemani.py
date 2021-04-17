@@ -7,11 +7,14 @@ import numpy as np
 
 
 #%%
-#url = 'https://www.seekpng.com/png/detail/116-1164659_line-drawing-bunny-rabbit-at-getdrawings-bunny-drawing.png'
-url = 'https://lh3.googleusercontent.com/proxy/_j7J9PlqYfCUUFduzzKbulOkZvdr526F88U481R5tV0eZGlNU2mNr-fURkUBseryy3aUIuc_x2uycYPcwE6QnQG05qdQ3E_5nEvlD0MF5M6zELEZa4CHIUjufmw-s_LoIdJO-Pk'
+url = 'https://www.seekpng.com/png/detail/116-1164659_line-drawing-bunny-rabbit-at-getdrawings-bunny-drawing.png'
+#url = 'https://lh3.googleusercontent.com/proxy/_j7J9PlqYfCUUFduzzKbulOkZvdr526F88U481R5tV0eZGlNU2mNr-fURkUBseryy3aUIuc_x2uycYPcwE6QnQG05qdQ3E_5nEvlD0MF5M6zELEZa4CHIUjufmw-s_LoIdJO-Pk'
+#url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Heraldique_chien_courrent.svg/1199px-Heraldique_chien_courrent.svg.png'
+
 
 response = requests.get(url)
 img_raw = Image.open(BytesIO(response.content))
+print(img_raw.format,img_raw.size, img_raw.mode)
 pylab.imshow(img_raw)
 pylab.show()
 
@@ -29,7 +32,10 @@ class Imagemanip:
 
         # Show raw image 
         imshow(np.asarray(self.img))
-
+        print("The image format is : {}".format(self.img.format))
+        print("The image size is : {}".format(self.img.size))
+        print("The image mode is : {}".format(self.img.mode))
+        
     def single_color(self):
         
         # convert image to single color
@@ -63,15 +69,22 @@ class Imagemanip:
 
         # Show black and white image 
         imshow(np.asarray(self.img_blackwhite))
-
+        print("The image format is : {}".format(self.img_blackwhite.format))
+        print("The image size is : {}".format(self.img_blackwhite.size))
+        print("The image mode is : {}".format(self.img_blackwhite.mode))
+        print("Numbre of pixels is: {}".format(self.pixels.sum()))
 
 
 #%%
 rabbit = Imagemanip(img_raw)
 rabbit.show()
 
+
+#%%
 rabbit.single_color()
 rabbit.convert_binary(scale=3, thresh_val=200)
 rabbit.black_and_white()
 rabbit.show_black_and_white()
+# %%
+
 # %%
