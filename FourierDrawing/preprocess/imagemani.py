@@ -68,5 +68,8 @@ class Imagemanip:
 rabbit = Imagemanip(img_raw)
 rabbit.show()
 
-
+rabbit.single_color()
+rabbit.convert_binary(scale=3, thresh_val=200)
+rabbit.black_and_white()
+rabbit.show_black_and_white()
 # %%
