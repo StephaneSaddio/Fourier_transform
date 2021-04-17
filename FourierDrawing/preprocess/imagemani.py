@@ -1,5 +1,4 @@
 #%%
-
 from PIL import Image
 import requests
 from io import BytesIO
@@ -31,13 +30,13 @@ class Imagemanip:
 
     def single_color(self):
         
-        # convert image to single color 
+        # convert image to single color
         self.img_single_color = self.img.convert('L')
 
     def convert_binary(self, scale=3, thresh_val=200):   
 
-        # convert image to nympy array 
-        image_array = np.array(image)
+        # convert image to nympy array
+        image_array = np.array(self.img_single_color)
 
         # convert to binary image_array using thresh_val to cut
         white = 255
@@ -51,14 +50,23 @@ class Imagemanip:
         # reduce number of non-zero pixels by scaling down the image
         self.img_scale = image.resize(tuple([int(v/scale) for v in image.size]),Image.ANTIALIAS)
     
-
     def black_and_white(self):
         
         # convert image to black and white
         self.img_blackwhite = self.img.convert(mode='1', dither=2)
+        self.pixels = (1 - np.asarray(self.img_blackwhite).astype(int))
+        self.pixels_flat = np.reshape(self.pixels, self.pixels.size)
+
+    def show_black_and_white(self):
+
+        # Show black and white image 
+        imshow(np.asarray(self.img_blackwhite))
+
 
 
 #%%
 rabbit = Imagemanip(img_raw)
 rabbit.show()
 
+
+# %%
