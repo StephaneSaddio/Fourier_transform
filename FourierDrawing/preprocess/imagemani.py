@@ -15,7 +15,7 @@ pylab.show()
 
 
 #%%
-class ImageObject:
+class Imagemanip:
 
     def __init__(self, img_brut ):
         self.img = img_brut
@@ -24,3 +24,9 @@ class ImageObject:
     def show(self):
         imshow(np.asarray(self.img))
 
+
+#%%
+rabbit = Imagemanip(img_brut)
+rabbit.show()
+
+# %%
