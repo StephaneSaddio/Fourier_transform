@@ -7,7 +7,9 @@ import numpy as np
 
 
 #%%
-url = 'https://www.seekpng.com/png/detail/116-1164659_line-drawing-bunny-rabbit-at-getdrawings-bunny-drawing.png'
+#url = 'https://www.seekpng.com/png/detail/116-1164659_line-drawing-bunny-rabbit-at-getdrawings-bunny-drawing.png'
+url = 'https://lh3.googleusercontent.com/proxy/_j7J9PlqYfCUUFduzzKbulOkZvdr526F88U481R5tV0eZGlNU2mNr-fURkUBseryy3aUIuc_x2uycYPcwE6QnQG05qdQ3E_5nEvlD0MF5M6zELEZa4CHIUjufmw-s_LoIdJO-Pk'
+
 response = requests.get(url)
 img_raw = Image.open(BytesIO(response.content))
 pylab.imshow(img_raw)
