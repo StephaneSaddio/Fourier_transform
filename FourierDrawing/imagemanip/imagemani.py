@@ -142,6 +142,25 @@ class Imagemanip:
         if plot:
             plt.plot(self.x_tour, self.y_tour)
 
+    def get_splines(self, degree=1, plot=True):
+ 
+        # Smooth the curves tour angles
+        length_pixels_list = list(range(0,self.length_pixels))
+        x_spl = UnivariateSpline(length_pixels_list, self.x_tour, k=degree)
+        y_spl = UnivariateSpline(length_pixels_list, self.y_tour, k=degree)
+        
+        self.x_spl = x_spl
+        self.y_spl = y_spl
+        
+        if plot:
+            vect = np.linspace(0, self.length_pixels-1, 1000)
+            x_cord = list()
+            y_cord = list()
+            for v in vect:
+                x_cord.append(x_spl(v))
+                y_cord.append(y_spl(v))  
+            p = plt.plot(x_cord,y_cord)
+
 
 #%%
 rabbit = Imagemanip(img_raw)
@@ -159,6 +178,9 @@ rabbit.distance_matrix()
 
 #%%
 rabbit.contours_search(plot=True)
+# %%
+from scipy.interpolate import UnivariateSpline
+rabbit.get_splines(plot=True)
 # %%
 
 # %%
