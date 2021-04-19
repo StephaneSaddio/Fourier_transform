@@ -83,7 +83,8 @@ class Imagemanip:
         # Find positions of non-zero pixels
         non_zero_P_index = np.where(self.pixels_line > 0)[0]
         # Make a range array index form 1 to len(non_zero_P_index)
-        arrange_index = np.array(range(1, len(non_zero_P_index)+1 ))
+        N = len(non_zero_P_index)+1
+        arrange_index = np.array(range(1, N ))
         
         # Replace each non-zero pixel with its number
         self.flat_img_mod = deepcopy(self.pixels_line)
@@ -99,7 +100,7 @@ class Imagemanip:
         
         # Calcualte distance between each pair of coords
         self.distance_matrix = distance.cdist(self.coord_list, self.coord_list, 'euclidean')
-
+        #return(self.coord_list[:,0])
    
     def contours_search(self, plot=True):
 
@@ -115,17 +116,21 @@ class Imagemanip:
         # Look for the point closest to the current edge
         for step in range(0, length_edges):
             dist_row = deepcopy(self.distance_matrix[current_edge,:])
-            for k in tour:
-                dist_row[k] = np.inf
+            for i in tour:
+                dist_row[i] = np.inf
             nearest_neighbor = np.argmin(dist_row)
             if nearest_neighbor not in tour:
                 tour.append(nearest_neighbor)
             current_edge = nearest_neighbor
 
+        x_y_tour = list()
+        for i in range(length_edges+1):
+            v = edges[tour[i % length_edges]]  
+            x_y_tour.append(v)
+        xy_tour = np.array(x_y_tour)
 
-        y_tour = -np.array([edges[tour[i % length_edges]] for i in range(length_edges+1) ])[:,0]
-        x_tour = np.array([edges[tour[i % length_edges]] for i in range(length_edges+1) ])[:,1]
-
+        x_tour = xy_tour[:,1]
+        y_tour = -xy_tour[:,0]
 
         x_tour = x_tour - x_tour[0]
         y_tour = y_tour - y_tour[0]
@@ -183,4 +188,82 @@ from scipy.interpolate import UnivariateSpline
 rabbit.get_splines(plot=True)
 # %%
 
+# %%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#%%
+
+#%%
+        edges = coord_list=rabbit.coord_list
+        length_edges = len(edges)
+# %%
+distance_matrix =rabbit.distance_matrix
+
+#%%
+        # Set a random starting edge form length edges
+        start = 6
+#%%
+        # Set the starting edge for heuristic nearest neighbor research
+        tour = [start]
+        current_edge = start
+#%%
+        # Look for the point closest to the current edge
+        for step in range(0, length_edges):
+            dist_row = deepcopy(distance_matrix[current_edge,:])
+            for i in tour:
+                dist_row[i] = np.inf
+            nearest_neighbor = np.argmin(dist_row)
+            if nearest_neighbor not in tour:
+                tour.append(nearest_neighbor)
+            current_edge = nearest_neighbor
+#%%
+
+        y_tour = -np.array([edges[tour[i % length_edges]] for i in range(length_edges+1) ])[:,0]
+        x_tour = np.array([edges[tour[i % length_edges]] for i in range(length_edges+1) ])[:,1]
+
+#%%
+        x_tour = x_tour - x_tour[0]
+        y_tour = y_tour - y_tour[0]
+# %%
+xy_tour1 = list()
+#%%
+for i in range(length_edges+1):
+    v = edges[tour[i % length_edges]]  
+    xy_tour1.append(v)
+
+xxyy_tour1 = np.array(xy_tour1)
+
+#%%
+x_tour1 = xxyy_tour1[:,1]
+y_tour1 = -xxyy_tour1[:,0]
+#%%
+        x_tour1 = x_tour1 - x_tour1[0]
+        y_tour1 = y_tour1 - y_tour1[0]
 # %%
