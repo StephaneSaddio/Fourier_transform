@@ -52,14 +52,9 @@ class Imagemanip:
         for i in range(len(image_array)):
             for j in range(len(image_array[0])):
                 if image_array[i][j] > thresh_val:
-                    image_array[i][j] = 255
+                    image_array[i][j] = 255 #white
                 else:
-                    image_array[i][j] = 0
-        #white = 255
-        #black = 0
-#
-        #initial_conv = np.where((image_array > 200), image_array, 255)
-        #final_conv = np.where((initial_conv <= 200), initial_conv, 0)
+                    image_array[i][j] = 0   #black
 
         image = Image.fromarray(image_array)
         
@@ -132,20 +127,8 @@ class Imagemanip:
         x_tour = np.array([edges[tour[i % length_edges]] for i in range(length_edges+1) ])[:,1]
 
 
-        x_tour = x_tour - x_tour[0]#- min(x_tour)
-        y_tour = y_tour - y_tour[0]#- min(y_tour)
-        #A = []
-        #B = []
-        #for i in range(length_edges+1):
-        #    A = edges[tour[i % length_edges]]
-        #    #AA = -np.array(edges[tour[i % length_edges]])
-        #y_tour = -np.array(A[:,0])
-        #y_tour = y_tour - y_tour[0]
-        #for i in range(length_edges+1):
-        #    B = edges[tour[i % length_edges]]
-        #    #AA = -np.array(edges[tour[i % length_edges]])
-        #x_tour = -np.array(B[:,1])
-        #x_tour = x_tour - x_tour[0]
+        x_tour = x_tour - x_tour[0]
+        y_tour = y_tour - y_tour[0]
 
         # Close the circuit by returning to the beginning point
         np.append(x_tour, x_tour[0])
@@ -155,9 +138,11 @@ class Imagemanip:
         self.x_tour = x_tour
         self.y_tour = y_tour
         self.length_pixels = length_edges
-
+        # Show the image countour
         if plot:
             plt.plot(self.x_tour, self.y_tour)
+
+
 #%%
 rabbit = Imagemanip(img_raw)
 rabbit.show()
