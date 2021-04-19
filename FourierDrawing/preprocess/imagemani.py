@@ -32,6 +32,7 @@ class Imagemanip:
 
         # Show raw image 
         imshow(np.asarray(self.img))
+        # Show image informations
         print("The image format is : {}".format(self.img.format))
         print("The image size is : {}".format(self.img.size))
         print("The image mode is : {}".format(self.img.mode))
@@ -63,18 +64,41 @@ class Imagemanip:
         # convert image to black and white
         self.img_blackwhite = self.img.convert(mode='1', dither=2)
         self.pixels = (1 - np.asarray(self.img_blackwhite).astype(int))
-        self.pixels_flat = np.reshape(self.pixels, self.pixels.size)
+        self.pixels_line = np.reshape(self.pixels, self.pixels.size)
 
     def show_black_and_white(self):
 
         # Show black and white image 
         imshow(np.asarray(self.img_blackwhite))
+        # Show black and white image informations
         print("The image format is : {}".format(self.img_blackwhite.format))
         print("The image size is : {}".format(self.img_blackwhite.size))
         print("The image mode is : {}".format(self.img_blackwhite.mode))
         print("Numbre of pixels is: {}".format(self.pixels.sum()))
 
+    def distance_matrix(self):
+    
+        # Find positions of non-zero pixels
+        non_zero_P_index = np.where(self.pixels_line > 0)[0]
+        # Make a range array index form 1 to len(non_zero_P_index)
+        arrange_index = np.array(range(1, len(non_zero_P_index)+1 ))
+        
+        # Replace each non-zero pixel with its number
+        self.flat_img_mod = deepcopy(self.pixels_line)
+        for rel, pix in enumerate(non_zero_P_index):
+            self.flat_img_mod[pix] = rel+1
 
+        # Get coordiantes for each non-zero pixel
+        img_idx = np.reshape(self.flat_img_mod, self.pixels.shape)
+        self.coord_list = []
+        for p1 in arrange_index:
+            p1_coords = tuple([int(c) for c in np.where(img_idx==p1)])
+            self.coord_list.append(list(p1_coords))
+        
+        # Calcualte distance between each pair of coords
+        self.distance_matrix = distance.cdist(self.coord_list, self.coord_list, 'euclidean')
+
+    
 #%%
 rabbit = Imagemanip(img_raw)
 rabbit.show()
@@ -86,5 +110,5 @@ rabbit.convert_binary(scale=3, thresh_val=200)
 rabbit.black_and_white()
 rabbit.show_black_and_white()
 # %%
-
+rabbit.distance_matrix()
 # %%
