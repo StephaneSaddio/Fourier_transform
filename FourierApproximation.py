@@ -1,8 +1,9 @@
+#%%
 import numpy as np
 
 # Fourier.get_circles
 from itertools import chain
-
+#%%
 class Fourier(object):
     def __init__(self, n_approx = 1000, coord_1 = None, coord_2 = None):
         if coord_1 is not None:
@@ -151,3 +152,5 @@ class Fourier(object):
 
     def cartesian_locations(self, time, period, multiple, fourier_coeff):
         return fourier_coeff * np.exp(1j * ((2*multiple*np.pi/period) * time))
+
+# %%
