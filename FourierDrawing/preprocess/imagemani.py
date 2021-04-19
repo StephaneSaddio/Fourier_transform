@@ -49,12 +49,17 @@ class Imagemanip:
         image_array = np.array(self.img_single_color)
 
         # convert to binary image_array using thresh_val to cut
-        for i in range(len(image_array)):
-            for j in range(len(image_array[0])):
-                if image_array[i][j] > thresh_val:
-                    image_array[i][j] = 255
-                else:
-                    image_array[i][j] = 0
+        #for i in range(len(image_array)):
+        #    for j in range(len(image_array[0])):
+        #        if image_array[i][j] > thresh_val:
+        #            image_array[i][j] = 255
+        #        else:
+        #            image_array[i][j] = 0
+        white = 255
+        black = 0
+
+        initial_conv = np.where((image_array > 200), image_array, 255)
+        final_conv = np.where((initial_conv <= 200), initial_conv, 0)
 
         image = Image.fromarray(image_array)
         
