@@ -33,6 +33,7 @@ class Imagemanip:
 
         # Show raw image 
         pylab.imshow(np.asarray(self.img))
+
         # Show image informations
         print("The image format is : {}".format(self.img.format))
         print("The image size is : {}".format(self.img.size))
@@ -72,6 +73,7 @@ class Imagemanip:
 
         # Show black and white image 
         pylab.imshow(np.asarray(self.img_blackwhite))
+
         # Show black and white image informations
         print("The image format is : {}".format(self.img_blackwhite.format))
         print("The image size is : {}".format(self.img_blackwhite.size))
@@ -81,38 +83,39 @@ class Imagemanip:
     def distance_matrix(self):
 
         # Find positions of non-zero pixels
-        non_zero_P_index = np.where(self.pixels_line > 0)[0]
+        non_zero_P_index = np.where(self.pixels_vector > 0)[0]
+
         # Make a range array index form 1 to len(non_zero_P_index)
         N = len(non_zero_P_index)+1
-        arrange_index = np.array(range(1, N ))
+        self.arrange_index = np.array(range(1, N ))
         
         # Replace each non-zero pixel with its number
-        self.flat_img_mod = deepcopy(self.pixels_line)
-        for rel, pix in enumerate(non_zero_P_index):
-            self.flat_img_mod[pix] = rel+1
+        self.flat_img_mod = deepcopy(self.pixels_vector)
+        for r, pix in enumerate(non_zero_P_index):
+            self.flat_img_mod[pix] = r+1
 
         # Get coordiantes for each non-zero pixel
-        img_idx = np.reshape(self.flat_img_mod, self.pixels.shape)
+        self.img_idx = np.reshape(self.flat_img_mod, self.pixels.shape)
         self.coord_list = []
-        for v in arrange_index:
-            v_coords = tuple([int(i) for i in np.where(img_idx==v)])
+        for v in self.arrange_index:
+            v_coords = tuple([int(i) for i in np.where(self.img_idx==v)])
             self.coord_list.append(list(v_coords))
         
         # Calcualte distance between each pair of coords
         self.distance_matrix = distance.cdist(self.coord_list, self.coord_list, 'euclidean')
-        #return(self.coord_list[:,0])
    
     def contours_search(self, plot=True):
-
         
         edges = self.coord_list
         length_edges = len(edges)
 
         # Set a random starting edge form length edges
         start = int(np.random.choice(range(length_edges),size=1))
+
         # Set the starting edge for heuristic nearest neighbor research
         tour = [start]
         current_edge = start
+
         # Look for the point closest to the current edge
         for step in range(0, length_edges):
             dist_row = deepcopy(self.distance_matrix[current_edge,:])
@@ -122,7 +125,8 @@ class Imagemanip:
             if nearest_neighbor not in tour:
                 tour.append(nearest_neighbor)
             current_edge = nearest_neighbor
-
+        
+        # Extract the coordinates of the tour points 
         x_y_tour = list()
         for i in range(length_edges+1):
             v = edges[tour[i % length_edges]]  
@@ -143,6 +147,7 @@ class Imagemanip:
         self.x_tour = x_tour
         self.y_tour = y_tour
         self.length_pixels = length_edges
+
         # Show the image countour
         if plot:
             plt.plot(self.x_tour, self.y_tour)
@@ -186,84 +191,4 @@ rabbit.contours_search(plot=True)
 # %%
 from scipy.interpolate import UnivariateSpline
 rabbit.get_splines(plot=True)
-# %%
-
-# %%
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#%%
-
-#%%
-        edges = coord_list=rabbit.coord_list
-        length_edges = len(edges)
-# %%
-distance_matrix =rabbit.distance_matrix
-
-#%%
-        # Set a random starting edge form length edges
-        start = 6
-#%%
-        # Set the starting edge for heuristic nearest neighbor research
-        tour = [start]
-        current_edge = start
-#%%
-        # Look for the point closest to the current edge
-        for step in range(0, length_edges):
-            dist_row = deepcopy(distance_matrix[current_edge,:])
-            for i in tour:
-                dist_row[i] = np.inf
-            nearest_neighbor = np.argmin(dist_row)
-            if nearest_neighbor not in tour:
-                tour.append(nearest_neighbor)
-            current_edge = nearest_neighbor
-#%%
-
-        y_tour = -np.array([edges[tour[i % length_edges]] for i in range(length_edges+1) ])[:,0]
-        x_tour = np.array([edges[tour[i % length_edges]] for i in range(length_edges+1) ])[:,1]
-
-#%%
-        x_tour = x_tour - x_tour[0]
-        y_tour = y_tour - y_tour[0]
-# %%
-xy_tour1 = list()
-#%%
-for i in range(length_edges+1):
-    v = edges[tour[i % length_edges]]  
-    xy_tour1.append(v)
-
-xxyy_tour1 = np.array(xy_tour1)
-
-#%%
-x_tour1 = xxyy_tour1[:,1]
-y_tour1 = -xxyy_tour1[:,0]
-#%%
-        x_tour1 = x_tour1 - x_tour1[0]
-        y_tour1 = y_tour1 - y_tour1[0]
 # %%
