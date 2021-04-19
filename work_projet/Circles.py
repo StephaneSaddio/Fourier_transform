@@ -1,35 +1,52 @@
+#%%
+import matplotlib
+from matplotlib import animation, rc
+import matplotlib.pyplot as plt
+from matplotlib.pyplot import imshow
+from IPython.display import HTML
+import numpy as np
+from PIL import Image, ImageEnhance
+import requests
+from io import BytesIO
+from copy import deepcopy
+from scipy.spatial import distance
+from scipy.interpolate import UnivariateSpline
+from copy import deepcopy
+
+
+#%%
 
 class Circles:
-    """ Circles Class:
+    """
         Tracks radii and centers of circles implied by 
         Fourier decomposition of given FourierTransform object
     """
     def __init__(self,
                  FT, # FourierTransform object
-                 num_circles=20, # Number of circles to keep track of
+                 num_circles=20, # Number of circles to track
                  t_init=0, # Initial time state of object
                  origin=(0, 0) # Center of the first circle
         ):
         self.FT = FT
         self.t_init = t_init
         if num_circles > FT.N:
-            raise Exception("num_circles exceeds the degree of the given Fourier series.")
+            raise Exception("num_cicles can not exceed The Degree of the Given Fourier series.")
         self.num_circles = num_circles
         self.origin = origin
         self.origin_x = origin[0]
         self.origin_y = origin[1]
-        self.t_elapsed = 0
-        self.steps_elapsed = 0
+        self.t_times = 0
+        self.steps_times = 0
         self.t_current = self.t_init
         self.t_index_current = 0
         self.true_fxn_val_current = self.FT.fxn_vals[t_init]
         self.fourier_approx_val_current = self.FT.fourier_approximation[t_init]
         
-        self.Xs = [] # Track the coords of the center of the last circle
-        self.Ys = [] # for each value of t 
+        self.X = [] # Track the coords of the center of the last circle
+        self.Y = [] # for each value of t 
         
-        self.As = FT.amplitudes[0:num_circles] # Amplitude of each frequency/circle
-        self.Zs = FT.phases[0:num_circles] # Phase of each frequency/cirlce
+        self.A = FT.amplitudes[0:num_circles] # Amplitude of each frequency corresponding circle
+        self.Z = FT.phases[0:num_circles] # Phase of each frequency corresponding cirlce
     
     def circle_positions(self, transpose=False):
         """compute the current radii and centers of each circle at the current value of t"""
@@ -48,21 +65,21 @@ class Circles:
         y_centers = [deepcopy(self.origin_y)]
         
         for i in range(0,num_circles):
-            freq = i+1 # Corresponding frequency for given circle/coefficient
-            a = self.As[i] # Magnitude (i.e., amplitude) of complex coefficient
-            z = self.Zs[i] # Argument (i.e., phase) of complex coefficient
+            frequency = i+1 # Corresponding frequency for given circle/coefficient
+            m = self.A[i] # Magnitude (i.e., amplitude) of complex coefficient
+            a = self.Z[i] # Argument (i.e., phase) of complex coefficient
 
             radius = 2*a
             radii.append(radius)
             
-            running_x_offset += 2*a*np.cos(t*2*np.pi*freq/self.FT.period + z)
-            running_y_offset += 2*a*np.sin(t*2*np.pi*freq/self.FT.period + z)
+            running_x_offset += 2*m*np.cos(t*2*np.pi*frequency/self.FT.period + a)
+            running_y_offset += 2*m*np.sin(t*2*np.pi*frequency/self.FT.period + a)
             
-            if i < num_circles-1:
+            if (i < num_circles-1):
                 x_centers.append(running_x_offset)
                 y_centers.append(running_y_offset)
             
-        if t==0:
+        if (t==0):
                         self.circles_offset = running_x_offset
         radii = np.array(radii)
         x_centers = np.array(x_centers) - self.circles_offset + self.FT.origin_offset
@@ -71,8 +88,8 @@ class Circles:
         x_final = running_x_offset - self.circles_offset + self.FT.origin_offset
         y_final = running_y_offset
         
-        self.Xs.append(x_final)
-        self.Ys.append(y_final)
+        self.X.append(x_final)
+        self.Y.append(y_final)
         
         if transpose:
             return(radii, -y_centers, x_centers, -y_final, x_final)
@@ -82,16 +99,16 @@ class Circles:
     def get_circles(self, transpose=False):
         return(self.circle_positions(transpose=transpose))
     
-    def step(self, dt=1):
-        # dt = how many times to increment t_vals array for each step
-        self.steps_elapsed += 1
-        next_index = dt*self.steps_elapsed 
+    def phase(self, dt=1):
+        # dt = The number of times to increase "t_vals" for each step
+        self.steps_times += 1
+        next_index = dt*self.steps_times 
         if next_index > len(self.FT.t_vals)-1:
-            print("Max t-value reached")
-            self.steps_elapsed -= 1
+            print("Max t-value is reached")
+            self.steps_times -= 1
         else:
             self.t_current = self.FT.t_vals[next_index]
-            self.t_elapsed = self.t_current - self.t_init
+            self.t_times = self.t_current - self.t_init
             self.t_index_current = next_index
             self.true_fxn_val_current = self.FT.fxn_vals[next_index]
             self.fourier_approx_val_current = self.FT.fourier_approximation[next_index]
@@ -99,11 +116,20 @@ class Circles:
 #%%
 # Animate the Circles!
 #%%
+
+#%%
+# Obviously, it helps to have a simple image with only 2 colors and 
+# close to a single path
+url = "http://thevirtualinstructor.com/images/continuouslinedrawinghorse.jpg"
+horse = ImageObject(url)
+horse.show()
+#%%
 x_spl = horse.x_spl
 y_spl = horse.y_spl
 num_pixels = horse.num_pixels
 
 # Number of circles to draw in animation
+#%%
 num_circles = 100
 
 anim_length = 20 # in seconds
