@@ -1,14 +1,15 @@
 from setuptools import setup
-from biketrauma_brd import __version__ as current_version
+from FourierDrawing_brd import __version__ as current_version
 
 setup(
-  name='biketrauma_brda',
+  name='FourierDrawing_brd',
   version=current_version,
-  description='Visualization of a bicycle accident db',
+  description='Fourier drawing',
   url='https://github.com/StephaneSadddio/packaging_tutorial',
-  author='Assia Berrandou',
+  author='Stephane SADIO',
   author_email='stephane.sadio@etu.umontpellier.fr',
   license='MIND',
-  packages=['biketrauma_brd','biketrauma_brd.io', 'biketrauma_brd.preprocess', 'biketrauma_brd.vis'],
+  packages=['FourierDrawing_brd','FourierDrawing_brd.Image', 'FourierDrawing_brd.FourierApproximation',
+   'FourierDrawing_brd.Circles','FourierDrawing_brd.Animate_FT'],
   zip_safe=False
 )
