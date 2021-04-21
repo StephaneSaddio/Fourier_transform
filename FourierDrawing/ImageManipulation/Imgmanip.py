@@ -7,42 +7,38 @@ import numpy as np
 import matplotlib.pyplot as plt
 from copy import deepcopy
 from scipy.spatial import distance
+from scipy.interpolate import UnivariateSpline
+
 #%%
 url = 'https://www.seekpng.com/png/detail/116-1164659_line-drawing-bunny-rabbit-at-getdrawings-bunny-drawing.png'
-#url = 'https://lh3.googleusercontent.com/proxy/_j7J9PlqYfCUUFduzzKbulOkZvdr526F88U481R5tV0eZGlNU2mNr-fURkUBseryy3aUIuc_x2uycYPcwE6QnQG05qdQ3E_5nEvlD0MF5M6zELEZa4CHIUjufmw-s_LoIdJO-Pk'
 #url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Heraldique_chien_courrent.svg/1199px-Heraldique_chien_courrent.svg.png'
-
-
-response = requests.get(url)
-img_raw = Image.open(BytesIO(response.content))
-print(img_raw.format,img_raw.size, img_raw.mode)
-pylab.imshow(img_raw)
-pylab.show()
 
 
 #%%
 class Imagemanip:
 
-    def __init__(self, img_raw ):
+    def __init__(self, url ):
     
         # Import raw image
-        self.img = img_raw
-        self.og_size = self.img.size
+        self.url = url
+        response = requests.get(url)
+        self.img_raw = Image.open(BytesIO(response.content))
+
     
     def show(self):
 
         # Show raw image 
-        pylab.imshow(np.asarray(self.img))
+        pylab.imshow(np.asarray(self.img_raw))
 
         # Show image informations
-        print("The image format is : {}".format(self.img.format))
-        print("The image size is : {}".format(self.img.size))
-        print("The image mode is : {}".format(self.img.mode))
+        print("The image format is : {}".format(self.img_raw.format))
+        print("The image size is : {}".format(self.img_raw.size))
+        print("The image mode is : {}".format(self.img_raw.mode))
         
     def single_color(self):
         
         # convert image to single color
-        self.img_single_color = self.img.convert('L')
+        self.img_single_color = self.img_raw.convert('L')
 
     def convert_binary(self, scale=3, thresh_val=200):   
 
@@ -67,7 +63,7 @@ class Imagemanip:
         # convert image to black and white
         self.img_blackwhite = self.img_scale.convert(mode='1', dither=2)
         self.pixels = (1 - np.asarray(self.img_blackwhite).astype(int))
-        self.pixels_line = np.reshape(self.pixels, self.pixels.size)
+        self.pixels_vector = np.reshape(self.pixels, self.pixels.size)
 
     def show_black_and_white(self):
 
@@ -87,7 +83,7 @@ class Imagemanip:
 
         # Make a range array index form 1 to len(non_zero_P_index)
         N = len(non_zero_P_index)+1
-        self.arrange_index = np.array(range(1, N ))
+        arrange_index = np.array(range(1, N ))
         
         # Replace each non-zero pixel with its number
         self.flat_img_mod = deepcopy(self.pixels_vector)
@@ -95,10 +91,10 @@ class Imagemanip:
             self.flat_img_mod[pix] = r+1
 
         # Get coordiantes for each non-zero pixel
-        self.img_idx = np.reshape(self.flat_img_mod, self.pixels.shape)
+        img_idx = np.reshape(self.flat_img_mod, self.pixels.shape)
         self.coord_list = []
-        for v in self.arrange_index:
-            v_coords = tuple([int(i) for i in np.where(self.img_idx==v)])
+        for v in arrange_index:
+            v_coords = tuple([int(i) for i in np.where(img_idx==v)])
             self.coord_list.append(list(v_coords))
         
         # Calcualte distance between each pair of coords
@@ -173,7 +169,7 @@ class Imagemanip:
 
 
 #%%
-rabbit = Imagemanip(img_raw)
+rabbit = Imagemanip(url)
 rabbit.show()
 
 
@@ -189,6 +185,6 @@ rabbit.distance_matrix()
 #%%
 rabbit.contours_search(plot=True)
 # %%
-from scipy.interpolate import UnivariateSpline
+
 rabbit.get_splines(plot=True)
 # %%
