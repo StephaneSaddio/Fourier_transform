@@ -1,16 +1,17 @@
-from src.Imgmanip import Imagemanip
-from src.Class_fourierApproximation import FourierApprox
+from Tests.src.Class_FourierApprox import Imagemanip
+from Tests.src.Class_FourierApprox import FourierApprox
 
 url = 'https://www.seekpng.com/png/detail/116-1164659_line-drawing-bunny-rabbit-at-getdrawings-bunny-drawing.png'
-Img = Imagemanip(url)
+rabbit = Imagemanip(url)
+rabbit.show()
 
-Img.single_color()
-Img.convert_binary(scale=3, thresh_val=200)
-Img.black_and_white()
-Img.show_black_and_white()
-Img.distance_matrix()
-Img.contours_search()
-Img.get_splines()
+rabbit.single_color()
+rabbit.convert_binary(scale=3, thresh_val=200)
+rabbit.black_and_white()
+rabbit.show_black_and_white()
+rabbit.distance_matrix()
+rabbit.contours_search()
+rabbit.get_splines()
 
+xFT =  FourierApprox(rabbit.x_spl, (0, rabbit.length_pixels), num_circles= 50)
 
-xFT =  FourierApprox(Img.x_spl, (0, Img.num_pixels), num_circles= 50)
