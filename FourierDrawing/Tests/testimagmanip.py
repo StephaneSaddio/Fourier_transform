@@ -19,14 +19,15 @@ class test_Imgmanip(unittest.TestCase):
         self.assertGreater(img.thresh_val, 0) # thresh_val > 0
         self.assertLess(img.thresh_val, 255) # thresh_val < 255
 
-    def test_array (self):
-        #img = Imagemanip(url)
-        #img.single_color()
-        #img.convert_binary(scale=3, thresh_val=200)
-        #for i in range(len(img.image_array)):
-        #    for j in range(len(img.image_array[0])):
-        #        self.assertEqual(img.image_array[i][j], 0)
-        self.assertEqual(3, (2 or 6))
+    def convert_binary (self):
+        """ """
+        img = Imagemanip(url)
+        img.single_color()
+        img.convert_binary(scale=3, thresh_val=200)
+        for i in range(len(img.image_array)):
+            for j in range(len(img.image_array[0])):
+                self.assertIn(img.image_array[i][j], (0,255))
+        #self.assertIn(0, (8,255))
 
 if __name__ == '__main__':
     unittest.main()
