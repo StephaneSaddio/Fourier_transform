@@ -29,7 +29,7 @@ class test_Imgmanip(unittest.TestCase):
         for i in range(len(img.image_array)):
             for j in range(len(img.image_array[0])):
                 self.assertIn(img.image_array[i][j], (0,255)) # = 0 or 255
-
+ 
 if __name__ == '__main__':
     unittest.main()
 
