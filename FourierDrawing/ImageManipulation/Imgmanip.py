@@ -8,15 +8,12 @@ import matplotlib.pyplot as plt
 from copy import deepcopy
 from scipy.spatial import distance
 from scipy.interpolate import UnivariateSpline
-
 #%%
 url = 'https://www.seekpng.com/png/detail/116-1164659_line-drawing-bunny-rabbit-at-getdrawings-bunny-drawing.png'
 #url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Heraldique_chien_courrent.svg/1199px-Heraldique_chien_courrent.svg.png'
 
 
-#%%
 class Imagemanip:
-
     def __init__(self, url ):
     
         # Import raw image
@@ -43,6 +40,7 @@ class Imagemanip:
     def convert_binary(self, scale=3, thresh_val=200):   
 
         # convert image to nympy array
+        self.thresh_val = thresh_val
         image_array = np.array(self.img_single_color)
 
         # convert to binary image_array using thresh_val to cut
@@ -52,7 +50,7 @@ class Imagemanip:
                     image_array[i][j] = 255 #white
                 else:
                     image_array[i][j] = 0   #black
-
+        self.image_array = image_array
         image = Image.fromarray(image_array)
         
         # reduce number of non-zero pixels by scaling down the image
@@ -167,24 +165,26 @@ class Imagemanip:
                 y_cord.append(y_spl(v))  
             p = plt.plot(x_cord,y_cord)
 
-
 #%%
-rabbit = Imagemanip(url)
-rabbit.show()
-
-
+#rabbit = Imagemanip(url)
+#rabbit.show()
+#
+#
 #%%
-rabbit.single_color()
-rabbit.convert_binary(scale=3, thresh_val=200)
-rabbit.black_and_white()
+#rabbit.single_color()
+#rabbit.convert_binary(scale=3, thresh_val=200)
+#rabbit.thresh_val
+#rabbit.black_and_white()
+#
+#rabbit.show_black_and_white()
+## %%
+#rabbit.distance_matrix()
+#
+##%%
+#rabbit.contours_search(plot=True)
+## %%
+#
+#rabbit.get_splines(plot=True)
+## %%
 
-rabbit.show_black_and_white()
-# %%
-rabbit.distance_matrix()
-
-#%%
-rabbit.contours_search(plot=True)
-# %%
-
-rabbit.get_splines(plot=True)
 # %%
