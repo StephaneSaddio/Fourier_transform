@@ -17,7 +17,8 @@ url = 'https://www.seekpng.com/png/detail/116-1164659_line-drawing-bunny-rabbit-
 class Imagemanip:
 
     def __init__(self, url ):
-    
+    """ Create image object  """
+
         # Import raw image
         self.url = url
         response = requests.get(url)
@@ -25,6 +26,7 @@ class Imagemanip:
 
     
     def show(self):
+    """ Show raw image and his informations """
 
         # Show raw image 
         pylab.imshow(np.asarray(self.img_raw))
@@ -35,11 +37,13 @@ class Imagemanip:
         print("The image mode is : {}".format(self.img_raw.mode))
         
     def single_color(self):
-        
-        # convert image to single color
+    """ Convert image to single color """  
+
+        #Convert image to single color
         self.img_single_color = self.img_raw.convert('L')
 
     def convert_binary(self, scale=3, thresh_val=200):   
+    """ Convert to binary image with 0 or 255 array values """
 
         # convert image to nympy array
 
@@ -63,14 +67,16 @@ class Imagemanip:
         self.img_scale = image.resize(tuple([int(v/scale) for v in image.size]),Image.ANTIALIAS)
     
     def black_and_white(self):
-        
+    """  Convert image to black and white """
+
         # convert image to black and white
         self.img_blackwhite = self.img_scale.convert(mode='1', dither=2)
         self.pixels = (1 - np.asarray(self.img_blackwhite).astype(int))
         self.pixels_vector = np.reshape(self.pixels, self.pixels.size)
 
     def show_black_and_white(self):
-
+    """  Show black and white image  """
+    
         # Show black and white image 
         pylab.imshow(np.asarray(self.img_blackwhite))
 
@@ -81,6 +87,7 @@ class Imagemanip:
         print("Numbre of pixels is: {}".format(self.pixels.sum()))
 
     def distance_matrix(self):
+    """ Get non-zero pixel coordiantes than calcualte distance between each pair of them """
 
         # Find positions of non-zero pixels
         non_zero_P_index = np.where(self.pixels_vector > 0)[0]
@@ -105,7 +112,8 @@ class Imagemanip:
         self.distance_matrix = distance.cdist(self.coord_list, self.coord_list, 'euclidean')
    
     def contours_search(self, plot=True):
-        
+    """ Get the image tour using the nearest neighbor heuristic  """ 
+
         edges = self.coord_list
         length_edges = len(edges)
 
@@ -153,7 +161,8 @@ class Imagemanip:
             plt.plot(self.x_tour, self.y_tour)
 
     def get_splines(self, degree=1, plot=True):
- 
+    """ Smooth the curves tour angles  """
+
         # Smooth the curves tour angles
         length_pixels_list = list(range(0,self.length_pixels))
         x_spl = UnivariateSpline(length_pixels_list, self.x_tour, k=degree)
