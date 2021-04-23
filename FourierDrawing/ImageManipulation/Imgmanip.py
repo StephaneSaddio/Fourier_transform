@@ -42,6 +42,10 @@ class Imagemanip:
     def convert_binary(self, scale=3, thresh_val=200):   
 
         # convert image to nympy array
+
+
+        self.thresh_val = thresh_val
+
         image_array = np.array(self.img_single_color)
 
         # convert to binary image_array using thresh_val to cut
@@ -52,6 +56,7 @@ class Imagemanip:
                 else:
                     image_array[i][j] = 0   #black
 
+        self.image_array = image_array
         image = Image.fromarray(image_array)
         
         # reduce number of non-zero pixels by scaling down the image
