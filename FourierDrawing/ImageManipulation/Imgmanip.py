@@ -11,7 +11,7 @@ from scipy.interpolate import UnivariateSpline
 
 class Imagemanip:
     def __init__(self, url ):
-    """ Create image object image  """
+    """ Create image object  """
 
         # Import raw image
         self.url = url
