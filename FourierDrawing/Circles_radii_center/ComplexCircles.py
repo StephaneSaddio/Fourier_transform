@@ -1,8 +1,12 @@
+#%%
+import numpy as np
+from copy import deepcopy
+
 
 #%%
 
 class Circles:
-    """Complex Circles Class:
+    """
         Tracks radii and centers of circles implied by 
         Fourier decomposition of given FourierTransform object
     """
@@ -14,9 +18,8 @@ class Circles:
         ):
         self.FT = FT
         self.t_init = t_init
-        #assert num_circles > FT.N, "Attribut 'num_circles' can not exceed The Degree of the Given Fourier series."
         if num_circles > FT.N:
-            raise Exception("num_circles exceeds the degree of the given Fourier series.")
+            raise Exception("num_cicles can not exceed The Degree of the Given Fourier series.")
         self.num_circles = num_circles
         self.origin = origin
         self.origin_x = origin[0]
@@ -99,4 +102,4 @@ class Circles:
             self.t_index_current = next_index
             self.true_fxn_val_current = self.FT.fxn_vals[next_index]
             self.fourier_approx_val_current = self.FT.fourier_approximation[next_index]
-
+# %%
