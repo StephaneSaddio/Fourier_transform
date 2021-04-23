@@ -2,13 +2,13 @@
 #%%
 
 class Circles:
-    """
+    """Complex Circles Class:
         Tracks radii and centers of circles implied by 
         Fourier decomposition of given FourierTransform object
     """
     def __init__(self,
                  FT, # FourierTransform object
-                 num_circles=30, # Number of circles to track
+                 num_circles=20, # Number of circles to track
                  t_init=0, # Initial time state of object
                  origin=(0, 0) # Center of the first circle
         ):
