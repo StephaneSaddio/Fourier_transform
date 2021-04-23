@@ -9,8 +9,6 @@ from copy import deepcopy
 from scipy.spatial import distance
 from scipy.interpolate import UnivariateSpline
 
-
-
 url = 'https://www.seekpng.com/png/detail/116-1164659_line-drawing-bunny-rabbit-at-getdrawings-bunny-drawing.png'
 #url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Heraldique_chien_courrent.svg/1199px-Heraldique_chien_courrent.svg.png'
 
