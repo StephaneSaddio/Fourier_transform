@@ -66,6 +66,7 @@ class Imagemanip:
 
     def show_black_and_white(self):
     """  Show black and white image  """
+    
         # Show black and white image 
         pylab.imshow(np.asarray(self.img_blackwhite))
 
@@ -77,6 +78,7 @@ class Imagemanip:
 
     def distance_matrix(self):
     """ Get non-zero pixel coordiantes than calcualte distance between each pair of them """
+
         # Find positions of non-zero pixels
         non_zero_P_index = np.where(self.pixels_vector > 0)[0]
 
@@ -100,7 +102,8 @@ class Imagemanip:
         self.distance_matrix = distance.cdist(self.coord_list, self.coord_list, 'euclidean')
    
     def contours_search(self, plot=True):
-    """ Get the image tour using the nearest neighbor heuristic  """    
+    """ Get the image tour using the nearest neighbor heuristic  """ 
+
         edges = self.coord_list
         length_edges = len(edges)
 
