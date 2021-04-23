@@ -1,13 +1,3 @@
-#%%
-import matplotlib
-import matplotlib.pyplot as plt
-from matplotlib.pyplot import imshow
-import numpy as np
-from PIL import Image, ImageEnhance
-import requests
-from io import BytesIO
-from copy import deepcopy
-
 
 #%%
 
@@ -18,14 +8,15 @@ class Circles:
     """
     def __init__(self,
                  FT, # FourierTransform object
-                 num_circles=20, # Number of circles to track
+                 num_circles=30, # Number of circles to track
                  t_init=0, # Initial time state of object
                  origin=(0, 0) # Center of the first circle
         ):
         self.FT = FT
         self.t_init = t_init
+        #assert num_circles > FT.N, "Attribut 'num_circles' can not exceed The Degree of the Given Fourier series."
         if num_circles > FT.N:
-            raise Exception("num_cicles can not exceed The Degree of the Given Fourier series.")
+            raise Exception("num_circles exceeds the degree of the given Fourier series.")
         self.num_circles = num_circles
         self.origin = origin
         self.origin_x = origin[0]
@@ -108,4 +99,4 @@ class Circles:
             self.t_index_current = next_index
             self.true_fxn_val_current = self.FT.fxn_vals[next_index]
             self.fourier_approx_val_current = self.FT.fourier_approximation[next_index]
-# %%
+
