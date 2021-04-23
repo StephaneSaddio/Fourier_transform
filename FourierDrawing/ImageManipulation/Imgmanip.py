@@ -1,4 +1,3 @@
-
 from PIL import Image
 import requests
 from io import BytesIO
@@ -9,13 +8,8 @@ from copy import deepcopy
 from scipy.spatial import distance
 from scipy.interpolate import UnivariateSpline
 
-url = 'https://www.seekpng.com/png/detail/116-1164659_line-drawing-bunny-rabbit-at-getdrawings-bunny-drawing.png'
-#url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Heraldique_chien_courrent.svg/1199px-Heraldique_chien_courrent.svg.png'
-
-
 
 class Imagemanip:
-
     def __init__(self, url ):
     """ Create image object  """
 
@@ -46,10 +40,7 @@ class Imagemanip:
     """ Convert to binary image with 0 or 255 array values """
 
         # convert image to nympy array
-
-
         self.thresh_val = thresh_val
-
         image_array = np.array(self.img_single_color)
 
         # convert to binary image_array using thresh_val to cut
@@ -59,7 +50,6 @@ class Imagemanip:
                     image_array[i][j] = 255 #white
                 else:
                     image_array[i][j] = 0   #black
-
         self.image_array = image_array
         image = Image.fromarray(image_array)
         
@@ -180,3 +170,4 @@ class Imagemanip:
                 y_cord.append(y_spl(v))  
             p = plt.plot(x_cord,y_cord)
 
+ 
