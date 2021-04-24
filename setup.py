@@ -1,5 +1,5 @@
 from setuptools import setup
-from FourierDrawing_brd import __version__ as current_version
+from FourierDrawing import __version__ as current_version
 
 setup(
   name='FourierDrawing_brd',
@@ -9,7 +9,7 @@ setup(
   author='Stephane SADIO',
   author_email='stephane.sadio@etu.umontpellier.fr',
   license='MIND',
-  packages=['FourierDrawing_brd','FourierDrawing_brd.Image', 'FourierDrawing_brd.FourierApproximation',
-   'FourierDrawing_brd.Circles','FourierDrawing_brd.Animate_FT'],
+  packages=['FourierDrawing','FourierDrawing_brd.ImageManipulation', 'FourierDrawing.FourierApproximation',
+   'FourierDrawing.Circles_radii_center','FourierDrawing.Animate_FT'],
   zip_safe=False
 )
